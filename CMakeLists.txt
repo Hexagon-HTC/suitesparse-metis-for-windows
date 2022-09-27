@@ -72,10 +72,10 @@ mark_as_advanced(LIB_POSTFIX)
 
 # We want libraries to be named "libXXX" and "libXXXd" in all compilers:
 # ------------------------------------------------------------------------
-set(CMAKE_DEBUG_POSTFIX  "d")
-IF(MSVC)
-	set(SP_LIB_PREFIX "lib")  # Libs are: "libXXX"
-ENDIF(MSVC)
+#set(CMAKE_DEBUG_POSTFIX  "d")
+#IF(MSVC)
+#	set(SP_LIB_PREFIX "lib")  # Libs are: "libXXX"
+#ENDIF(MSVC)
 
 ## check if we can build metis
 SET(BUILD_METIS_DEFAULT ON)
@@ -145,10 +145,11 @@ macro(install_suitesparse_project targetName headersList)
 		target_compile_options(${targetName} PRIVATE "-fPIC")
 	endif()
 
+	set_target_properties(${targetName} PROPERTIES PREFIX "")
+
 	## set include dir for install target
 	target_include_directories(${targetName} PUBLIC
-		$<INSTALL_INTERFACE:include>
-		$<INSTALL_INTERFACE:include/suitesparse>
+		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 	)
 
 	set_target_properties(${targetName} PROPERTIES PUBLIC_HEADER "${headersList}")
@@ -157,8 +158,11 @@ macro(install_suitesparse_project targetName headersList)
 			RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 			LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 			ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-			PUBLIC_HEADER DESTINATION include/suitesparse
+			PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 	)
+	if(MSVC)
+       install(FILES ${CMAKE_BINARY_DIR}/lib/Debug/${targetName}.pdb DESTINATION $<IF:$<BOOL:${BUILD_SHARED_LIBS}>,${CMAKE_INSTALL_BINDIR},${CMAKE_INSTALL_LIBDIR}> CONFIGURATIONS Debug)
+	endif(MSVC)
 endmacro()
 
 ## declare_suitesparse_library(targetName srcsList headersList)
@@ -218,6 +222,10 @@ if(WITH_CUDA)
 endif()
 
 hunter_add_package(LAPACK) # only in effect if HUNTER_ENABLED is set
+
+set(CMAKE_PREFIX_PATH "D:/work/3rdparties/clapack/3.2.1/I_PCP/stable/package/c6316f01661536b5f10df2495bc92b81bbd47190" ${CMAKE_PREFIX_PATH})
+
+set(CMAKE_PREFIX_PATH "D:/work/3rdparties/clapack/3.2.1/I_PCP/stable/package/c6316f01661536b5f10df2495bc92b81bbd47190" ${CMAKE_PREFIX_PATH})
 # prefer LAPACK config file
 find_package(LAPACK CONFIG)
 if (LAPACK_FOUND AND TARGET blas AND TARGET lapack)
@@ -287,7 +295,7 @@ endmacro()
 # get SuiteSparse version
 get_SuiteSparse_Version()
 
-set(ConfigPackageLocation ${CMAKE_INSTALL_LIBDIR}/cmake/suitesparse-${SuiteSparse_VERSION})
+set(ConfigPackageLocation ${CMAKE_INSTALL_LIBDIR}/cmake/suitesparse)
 ## create targets file
 export(EXPORT SuiteSparseTargets
 	FILE "${CMAKE_CURRENT_BINARY_DIR}/suitesparse/suitesparse-targets.cmake"

@@ -4,11 +4,11 @@ project(METIS)
 set(GKLIB_PATH "GKlib" CACHE PATH "path to GKlib")
 set(SHARED FALSE CACHE BOOL "build a shared library")
 
-if(MSVC)
-  set(METIS_INSTALL FALSE)
-else()
-  set(METIS_INSTALL TRUE)
-endif()
+# if(MSVC)
+#   set(METIS_INSTALL FALSE)
+# else()
+#   set(METIS_INSTALL TRUE)
+# endif()
 
 # Configure libmetis library.
 if(SHARED)

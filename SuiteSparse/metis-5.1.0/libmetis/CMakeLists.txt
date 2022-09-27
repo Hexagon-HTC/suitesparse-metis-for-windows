@@ -15,7 +15,8 @@ if(METIS_INSTALL)
     ARCHIVE DESTINATION lib)
 endif()
 
-				set_target_properties(metis PROPERTIES PUBLIC_HEADER "../include/metis.h")
+				set_target_properties(metis PROPERTIES PUBLIC_HEADER "../include/metis.h"
+                    PREFIX "")
 				install(TARGETS metis ## this line is also the string pattern to check if the modification had already done
 						EXPORT 	SuiteSparseTargets
 						RUNTIME DESTINATION bin
@@ -24,3 +25,6 @@ endif()
 						PUBLIC_HEADER DESTINATION include
 				)
 			
+if(MSVC)
+	install(FILES ${CMAKE_BINARY_DIR}/lib/Debug/metis.pdb DESTINATION $<IF:$<BOOL:${BUILD_SHARED_LIBS}>,${CMAKE_INSTALL_BINDIR},${CMAKE_INSTALL_LIBDIR}> CONFIGURATIONS Debug)
+endif(MSVC)
